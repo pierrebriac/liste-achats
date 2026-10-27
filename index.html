@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <meta name="description" content="Le matériel qu’il me reste à acheter pour traverser le Canada à vélo.">
+  <title>Liste des choses à acheter encore</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%230e2321'/%3E%3Cpath d='m20 8-2 10-10 6 6-10z' fill='%23d4512e'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@500&family=Work+Sans:wght@400;500;600&display=swap">
+  <style>
+    :root{--paper:#f3eee3;--surface:#fffbf3;--sunk:#e8e0cf;--ink:#13292a;--text:#26302e;--muted:#5f6a66;--line:#ddd4c2;--accent:#b53f20;--button:#13292a;--button-text:#f3eee3;color-scheme:light}
+    @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0e2321;--surface:#173431;--sunk:#12302d;--ink:#f3eee3;--text:#dfe6e2;--muted:#a7b6b0;--line:#2c4a46;--accent:#f08a68;--button:#f3eee3;--button-text:#0e2321;color-scheme:dark}}
+    :root[data-theme="dark"]{--paper:#0e2321;--surface:#173431;--sunk:#12302d;--ink:#f3eee3;--text:#dfe6e2;--muted:#a7b6b0;--line:#2c4a46;--accent:#f08a68;--button:#f3eee3;--button-text:#0e2321;color-scheme:dark}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--paper);color:var(--text);font:400 16px/1.6 'Work Sans',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+    main{max-width:860px;margin:0 auto;padding:40px 16px 64px}
+    h1,h2{font-family:'EB Garamond',Georgia,serif;font-weight:500;color:var(--ink);line-height:1.1;margin:0}
+    h1{font-size:clamp(34px,7vw,52px)}
+    .lead{margin:14px 0 0;max-width:640px;color:var(--muted)}
+    .intro{display:flex;flex-wrap:wrap;gap:4px 24px;align-items:baseline;justify-content:space-between;margin:28px 0 8px;padding:14px 16px;background:var(--sunk);border-radius:12px}
+    .intro p{margin:0}
+    .total{font-weight:600;color:var(--ink)}
+    .family{margin:32px 0 10px;font-size:26px}
+    ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+    .item{display:grid;grid-template-columns:1fr auto;gap:4px 16px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+    .item h3{margin:0;font:600 16px/1.35 inherit;color:var(--ink)}
+    .price{font-weight:600;color:var(--ink);white-space:nowrap;text-align:right}
+    .meta,.note{grid-column:1/-1;margin:0;color:var(--muted);font-size:14px}
+    .note summary{cursor:pointer;width:max-content}
+    .note p{margin:6px 0 0}
+    .actions{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin-top:4px;font-size:14px}
+    .actions a{color:var(--accent);font-weight:600}
+    .delete{border:0;background:none;color:var(--accent);font:inherit;text-decoration:underline;cursor:pointer;padding:0}
+    .admin{margin-top:44px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px 16px}
+    .admin h2{font-size:24px}
+    form{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));margin-top:14px}
+    label{display:grid;gap:4px;font-size:14px;font-weight:500}
+    .wide{grid-column:1/-1}
+    input,select,textarea{font:inherit;font-size:16px;color:var(--text);background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px;width:100%}
+    .buttons{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+    button.main,button.ghost{min-height:44px;padding:10px 20px;border-radius:999px;border:1.5px solid var(--button);background:var(--button);color:var(--button-text);font:600 15px inherit;cursor:pointer}
+    button.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+    :focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+    .status{min-height:1.6em;margin:12px 0 0;color:var(--muted)}
+    @media (max-width:520px){.item{grid-template-columns:1fr}.price{text-align:left}}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Liste des choses à acheter encore</h1>
+    <p class="lead">Le matériel qu’il me manque pour traverser le Canada à vélo en 2027. Les prix sont des budgets indicatifs. Pour les vêtements, les chaussures et les pièces du vélo, la taille ou la référence reste à confirmer avec moi.</p>
+    <div class="intro" aria-live="polite">
+      <p id="count" class="muted">Chargement de la liste…</p>
+      <p id="total" class="total"></p>
+    </div>
+    <div id="items"></div>
+
+    <section class="admin" aria-labelledby="admin-title">
+      <h2 id="admin-title">Modifier la liste</h2>
+      <form id="login-form">
+        <label>Mot de passe<input id="password" type="password" autocomplete="current-password" required></label>
+        <div class="buttons"><button class="main" type="submit">Se connecter</button></div>
+      </form>
+      <form id="add-form" hidden>
+        <label>Nom de l’article<input name="name" required maxlength="120"></label>
+        <label>Famille<input name="category" list="families" placeholder="Vêtements, Bivouac…" maxlength="40"></label>
+        <label>Modèle<input name="model" maxlength="120"></label>
+        <label>Quantité<input name="quantity" value="1" maxlength="20"></label>
+        <label>Prix total<input name="price" inputmode="decimal" placeholder="35,00"></label>
+        <label>Devise<select name="currency"><option>EUR</option><option>CAD</option></select></label>
+        <label class="wide">Lien<input name="url" type="url" placeholder="https://…" maxlength="500"></label>
+        <label class="wide">Précisions<textarea name="note" rows="3" maxlength="600"></textarea></label>
+        <div class="wide buttons">
+          <button class="main" type="submit">Ajouter à la liste</button>
+          <button class="ghost" type="button" id="logout">Se déconnecter</button>
+        </div>
+      </form>
+      <datalist id="families"></datalist>
+      <p id="status" class="status" role="status"></p>
+    </section>
+  </main>
+  <script>
+    // The list is kept by a small Cloudflare service; this page only shows it and sends changes.
+    const API = 'https://traversee-canada.p2vnz7jps8.workers.dev/api/achats';
+    const KEY = 'achats-mot-de-passe';
+    const $ = (id) => document.getElementById(id);
+    const money = (value, currency) => value.toLocaleString('fr-FR', { style: 'currency', currency });
+    let items = [];
+    let password = '';
+    try { password = localStorage.getItem(KEY) || ''; } catch {}
+
+    function el(tag, props = {}, ...children) {
+      const node = Object.assign(document.createElement(tag), props);
+      node.append(...children.filter((child) => child !== null && child !== undefined && child !== ''));
+      return node;
+    }
+
+    function render() {
+      const main = items.filter((item) => item.category !== 'Options');
+      const totals = {};
+      for (const item of main) if (item.price) totals[item.currency] = (totals[item.currency] || 0) + item.price;
+      $('count').textContent = `${main.length} article${main.length > 1 ? 's' : ''} à acheter`;
+      $('total').textContent = Object.keys(totals).length
+        ? 'Budget : ' + Object.entries(totals).map(([currency, value]) => money(value, currency)).join(' + ') : '';
+      const families = [...new Set(items.map((item) => item.category))].sort((a, b) => (a === 'Options') - (b === 'Options'));
+      $('families').replaceChildren(...families.map((family) => el('option', { value: family })));
+      $('items').replaceChildren(...families.flatMap((family) => [
+        el('h2', { className: 'family', textContent: family === 'Options' ? 'En option (pas indispensable)' : family }),
+        el('ul', {}, ...items.filter((item) => item.category === family).map(card)),
+      ]));
+    }
+
+    function card(item) {
+      const meta = [item.model, item.quantity && item.quantity !== '1' ? `Quantité : ${item.quantity}` : '',
+        item.usage === 'Traversée' ? 'Pour la traversée' : item.usage === 'Les deux' ? 'Entraînement et traversée' : ''].filter(Boolean).join(' · ');
+      const actions = el('div', { className: 'actions' },
+        item.url ? el('a', { href: item.url, target: '_blank', rel: 'noopener', textContent: 'Voir le produit →' }) : null);
+      if (password) {
+        const remove = el('button', { type: 'button', className: 'delete', textContent: 'Supprimer' });
+        remove.addEventListener('click', () => removeItem(item));
+        actions.append(remove);
+      }
+      return el('li', { className: 'item' },
+        el('h3', { textContent: item.name }),
+        el('span', { className: 'price', textContent: item.price ? money(item.price, item.currency) : '' }),
+        meta ? el('p', { className: 'meta', textContent: meta }) : null,
+        item.note ? el('details', { className: 'note' }, el('summary', { textContent: 'À savoir' }), el('p', { textContent: item.note })) : null,
+        actions.childNodes.length ? actions : null);
+    }
+
+    async function call(path, options = {}) {
+      const response = await fetch(API + path, { ...options, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${password}` } });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) throw Object.assign(new Error(body.error || 'Le serveur ne répond pas.'), { status: response.status });
+      return body;
+    }
+
+    function showAdmin() {
+      $('login-form').hidden = Boolean(password);
+      $('add-form').hidden = !password;
+      render();
+    }
+
+    function signOut(message = '') {
+      password = '';
+      try { localStorage.removeItem(KEY); } catch {}
+      $('status').textContent = message;
+      showAdmin();
+    }
+
+    async function removeItem(item) {
+      if (!confirm(`Supprimer « ${item.name} » de la liste ?`)) return;
+      try {
+        await call('/' + encodeURIComponent(item.id), { method: 'DELETE' });
+        items = items.filter((other) => other.id !== item.id);
+        $('status').textContent = `« ${item.name} » a été retiré.`;
+        render();
+      } catch (error) {
+        if (error.status === 401) signOut(error.message); else $('status').textContent = error.message;
+      }
+    }
+
+    $('login-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      password = $('password').value;
+      try {
+        await call('/connexion', { method: 'POST' });
+        try { localStorage.setItem(KEY, password); } catch {}
+        $('password').value = '';
+        $('status').textContent = 'Connecté : vous pouvez ajouter ou supprimer des articles.';
+        showAdmin();
+      } catch (error) {
+        password = '';
+        $('status').textContent = error.message;
+      }
+    });
+
+    $('add-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const form = event.target;
+      try {
+        const { item } = await call('', { method: 'POST', body: JSON.stringify(Object.fromEntries(new FormData(form))) });
+        items.push(item);
+        form.reset();
+        $('status').textContent = `« ${item.name} » a été ajouté.`;
+        render();
+      } catch (error) {
+        if (error.status === 401) signOut(error.message); else $('status').textContent = error.message;
+      }
+    });
+
+    $('logout').addEventListener('click', () => signOut('Déconnecté.'));
+
+    fetch(API).then((response) => response.json()).then((body) => { items = body.items; showAdmin(); })
+      .catch(() => { $('count').textContent = 'La liste n’a pas pu être chargée. Réessayez dans un instant.'; });
+  </script>
+</body>
+</html>
