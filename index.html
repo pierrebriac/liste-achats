@@ -23,7 +23,7 @@
     .intro{display:flex;flex-wrap:wrap;gap:4px 24px;align-items:baseline;justify-content:space-between;margin:28px 0 8px;padding:14px 16px;background:var(--sunk);border-radius:12px}
     .intro p{margin:0}
     .total{font-weight:600;color:var(--ink)}
-    .family{margin:32px 0 10px;font-size:26px}
+    .family{margin:32px 0 10px;font:500 26px/1.1 'EB Garamond',Georgia,serif;color:var(--ink)}
     ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
     .item{display:grid;grid-template-columns:1fr auto;gap:4px 16px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
     .item h3{margin:0;font:600 16px/1.35 inherit;color:var(--ink)}
@@ -44,6 +44,9 @@
     button.main,button.ghost{min-height:44px;padding:10px 20px;border-radius:999px;border:1.5px solid var(--button);background:var(--button);color:var(--button-text);font:600 15px inherit;cursor:pointer}
     button.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
     :focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+    .mine{margin-top:44px;padding-top:8px;border-top:1px solid var(--line)}
+    .mine .lead{margin-top:6px}
+    .mine .item{background:transparent}
     .status{min-height:1.6em;margin:12px 0 0;color:var(--muted)}
     @media (max-width:520px){.item{grid-template-columns:1fr}.price{text-align:left}}
   </style>
@@ -57,6 +60,11 @@
       <p id="total" class="total"></p>
     </div>
     <div id="items"></div>
+    <section class="mine" id="mine-section" hidden aria-labelledby="mine-title">
+      <h2 class="family" id="mine-title">Je m’en occupe moi-même</h2>
+      <p class="lead">Inutile de les acheter : je les choisis et les achète moi-même.</p>
+      <div id="mine"></div>
+    </section>
 
     <section class="admin" aria-labelledby="admin-title">
       <h2 id="admin-title">Modifier la liste</h2>
@@ -71,6 +79,7 @@
         <label>Quantité<input name="quantity" value="1" maxlength="20"></label>
         <label>Prix total<input name="price" inputmode="decimal" placeholder="35,00"></label>
         <label>Devise<select name="currency"><option>EUR</option><option>CAD</option></select></label>
+        <label>Qui l’achète ?<select name="status"><option value="à acheter">À acheter (on peut me l’offrir)</option><option value="moi">Je l’achète moi-même</option></select></label>
         <label class="wide">Lien<input name="url" type="url" placeholder="https://…" maxlength="500"></label>
         <label class="wide">Précisions<textarea name="note" rows="3" maxlength="600"></textarea></label>
         <div class="wide buttons">
@@ -98,19 +107,28 @@
       return node;
     }
 
+    const familiesOf = (list) => [...new Set(list.map((item) => item.category))].sort((a, b) => (a === 'Options') - (b === 'Options'));
+
+    function grouped(list, heading) {
+      return familiesOf(list).flatMap((family) => [
+        el(heading, { className: 'family', textContent: family === 'Options' ? 'En option (pas indispensable)' : family }),
+        el('ul', {}, ...list.filter((item) => item.category === family).map(card)),
+      ]);
+    }
+
     function render() {
-      const main = items.filter((item) => item.category !== 'Options');
+      const open = items.filter((item) => item.status !== 'moi');
+      const mine = items.filter((item) => item.status === 'moi');
+      const main = open.filter((item) => item.category !== 'Options');
       const totals = {};
       for (const item of main) if (item.price) totals[item.currency] = (totals[item.currency] || 0) + item.price;
       $('count').textContent = `${main.length} article${main.length > 1 ? 's' : ''} à acheter`;
       $('total').textContent = Object.keys(totals).length
-        ? 'Budget : ' + Object.entries(totals).map(([currency, value]) => money(value, currency)).join(' + ') : '';
-      const families = [...new Set(items.map((item) => item.category))].sort((a, b) => (a === 'Options') - (b === 'Options'));
-      $('families').replaceChildren(...families.map((family) => el('option', { value: family })));
-      $('items').replaceChildren(...families.flatMap((family) => [
-        el('h2', { className: 'family', textContent: family === 'Options' ? 'En option (pas indispensable)' : family }),
-        el('ul', {}, ...items.filter((item) => item.category === family).map(card)),
-      ]));
+        ? 'Budget connu : ' + Object.entries(totals).map(([currency, value]) => money(value, currency)).join(' + ') : '';
+      $('families').replaceChildren(...familiesOf(items).map((family) => el('option', { value: family })));
+      $('items').replaceChildren(...grouped(open, 'h2'));
+      $('mine').replaceChildren(...grouped(mine, 'h3'));
+      $('mine-section').hidden = !mine.length;
     }
 
     function card(item) {
